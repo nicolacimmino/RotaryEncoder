@@ -3,7 +3,7 @@
       {
          "name":"A",
          "wave":"0.1.0.1.0.1.0.1.",
-         "node":"..A.C.E.G.I.K.M."
+         "node":"..A.C.E.G"
       },
       {
          "name":"B",
@@ -23,17 +23,14 @@
             "6",
             "7"
          ],
-         "node":"..B.D.F.H.J.L.N"
+         "node":"..B.D.F.H"
       }
    ],
    "edge":[
       "A-B",
       "C-D",
       "E-F",
-      "G-H",
-      "I-J",
-      "K-L",
-      "M-N"      
+      "G-H"      
    ],
    "head":{
       "text":[
