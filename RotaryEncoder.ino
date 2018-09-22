@@ -9,115 +9,72 @@
 
 SSD1306AsciiAvrI2c oled;
 
-int16_t counter = 0;
+volatile int16_t counter = 0;
+volatile byte encoderMode = 0;
+volatile byte encoderDynamicMode = 0;
 
-byte mode = 0;
-
-/**
- * Simple scroll mode.
- * 
- * We register an interrupt on the rising edge of A and simply sample B and determine direction of 
- * roation based on the value of B.
- * 
- * - Prone to skipping on bad encoders with a lot of chatter.
- * - Response only every second detent as we process a single edge of A.
- * - Tedius for large changes.
- */
-
-void setupSimpleScroll()
-{
-    printModeHeader("Simple Scroll");
-    detachPCINT(digitalPinToPCINT(PIN_ENC_A));
-    attachPCINT(digitalPinToPCINT(PIN_ENC_A), processSimpleScroll, RISING);
-}
-
-void processSimpleScroll()
-{
-    int factor = digitalRead(PIN_ENC_B) ? 1 : -1;
-    applyCounterChange(factor);
-}
+extern void setup1XEncode();
+extern void setup2XEncode();
+extern void setup4XEncode();
 
 /**
- * Dynamic scroll mode.
- * 
- * We register an interrupt on the rising and falling edge of A. We then determine the direction of rotation based on 
- * the value of B or ~B depending on A. We also mesure the time interval between detents and smoothly increase the 
- * counter increase factor per detent based on the rotation speed.
- * 
- * - Reacts at every detent.
- * - Easier to make large changes.
+ * Array of function pointers to setup the various modes.
  */
+void (*modesSetters[3])() = {setup1XEncode, setup2XEncode, setup4XEncode};
 
-void setupDynamicScroll()
+String modeHeaders[3] = {"1X    ", "  2X  ", "    4X"};
+
+String dynamicModeHeaders[2] = {"  LIN", "     EXP"};
+
+/**
+ * Change mode. 
+ */
+void changeMode()
 {
-    printModeHeader("Dynamic Scroll");
-    detachPCINT(digitalPinToPCINT(PIN_ENC_A));
-    attachPCINT(digitalPinToPCINT(PIN_ENC_A), processDynamicScroll, CHANGE);
-}
+    byte debounce = 0x55;
+    while (debounce != 0x00)
+    {
+        debounce = (debounce < 1) | (digitalRead(PIN_ENC_SW) & 1);
+        delay(1);
+    }
 
-void processDynamicScroll()
-{
-    static unsigned long lastDetentTime = 0;
+    unsigned long initialTime = millis();
+    while ((millis() - initialTime < 500) && digitalRead(PIN_ENC_SW) == 0)
+    {
+        delay(1);
+    }
 
-    byte rotationDirection = digitalRead(PIN_ENC_A) ? digitalRead(PIN_ENC_B) : (~digitalRead(PIN_ENC_B)) & 1;
-
-    int factor = min(5, max(1, (20 - (signed long)(millis() - lastDetentTime)) / 4));
-
-    factor = rotationDirection ? factor : -factor;
-
-    applyCounterChange(factor);
-
-    lastDetentTime = millis();
+    if (digitalRead(PIN_ENC_SW) == 0)
+    {
+        encoderDynamicMode = (encoderDynamicMode + 1) % 2;
+    }
+    else
+    {
+        encoderMode = (encoderMode + 1) % (sizeof(modesSetters) / sizeof(modesSetters[0]));
+        modesSetters[encoderMode]();
+    }
 }
 
 /**
  * Apply a change to the counter.
  */
-void applyCounterChange(int factor)
+void applyCounterChange(bool cw)
 {
-    counter += factor;
+    int factor = 0;
+    if (encoderDynamicMode == 0)
+    {
+        factor = 1;
+    }
+    else if (encoderDynamicMode == 1)
+    {
+        static unsigned long lastDetentTime = 0;
+        factor = min(5, max(1, (20 - (signed long)(millis() - lastDetentTime)) / 4));
+        lastDetentTime = millis();
+    }
+
+    counter += cw ? factor : -factor;
+
     counter = (counter < 0) ? (360 + counter) : counter % 360;
-
-    oled.setCursor(0, 3);
-    oled.set2X();
-    String counterString = String("000");
-    counterString.concat(String(counter));
-    counterString = counterString.substring(counterString.length() - 3);
-
-    oled.print(counterString);
-}
-
-/**
- * Array of function pointers to setup the various modes.
- */
-void (*modesSetters[2])() = {setupSimpleScroll, setupDynamicScroll};
-
-/**
- * Print the mode header on the first line of the display.
- */
-void printModeHeader(String modeHeader)
-{
-    oled.clear();
-    oled.set1X();
-    oled.print(modeHeader);
-    applyCounterChange(0);
-}
-
-/**
- * Change to next mode. 
- */
-void changeMode()
-{
-    mode = (mode + 1) % (sizeof(modesSetters) / sizeof(modesSetters[0]));
-    initMode();
-}
-
-/**
- * Invode the setter function for the current mode.
- */
-void initMode()
-{
-    modesSetters[mode]();
 }
 
 void setup()
@@ -129,11 +86,37 @@ void setup()
     oled.begin(&Adafruit128x64, DISPLAY_I2C_ADDRESS);
     oled.setFont(System5x7);
 
-    attachPCINT(digitalPinToPCINT(PIN_ENC_SW), changeMode, RISING);
+    modesSetters[encoderMode]();
+    printHeader();
+}
 
-    initMode();
+void printHeader()
+{
+    oled.setCursor(0, 0);
+    oled.set1X();
+    oled.print(modeHeaders[encoderMode]);
+    oled.print(dynamicModeHeaders[encoderDynamicMode]);
+    oled.clearToEOL();
 }
 
 void loop()
 {
+    if (digitalRead(PIN_ENC_SW) == 0)
+    {
+        changeMode();
+
+        printHeader();
+
+        while (digitalRead(PIN_ENC_SW) == 0)
+        {
+            delay(1);
+        }
+    }
+
+    oled.setCursor(0, 3);
+    oled.set2X();
+    String counterString = String("000");
+    counterString.concat(String(counter));
+    counterString = counterString.substring(counterString.length() - 3);
+    oled.print(counterString);
 }
