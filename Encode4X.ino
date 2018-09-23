@@ -1,6 +1,6 @@
 
 // 4X encode mode.
-// 
+//
 // We count a step at every edge of A and B. Direction of travel is determined by
 // the status of B at the rising edge of A and !B at the falling edge of A, conversely
 // by the status of A at B falling edge and !A at be rising edge.

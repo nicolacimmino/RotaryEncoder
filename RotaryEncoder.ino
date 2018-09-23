@@ -1,5 +1,5 @@
 
-// Reference design for usage of a rotary encoder. 
+// Reference design for usage of a rotary encoder.
 // See https://github.com/nicolacimmino/RotaryEncoder for detailed explanation.
 //  Copyright (C) 2018 Nicola Cimmino
 //
@@ -106,7 +106,7 @@ void applyCounterChange(bool cw)
     else if (encoderDynamicMode == 1)
     {
         static unsigned long lastDetentTime = 0;
-        factor = min(5, max(1, (20 - (signed long)(millis() - lastDetentTime)) / 4));
+        factor = max(1, (20 - (signed long)(millis() - lastDetentTime)) >> 2);
         lastDetentTime = millis();
     }
 
