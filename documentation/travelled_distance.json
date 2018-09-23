@@ -1,0 +1,44 @@
+{
+   "signal":[
+      {
+         "name":"A",
+         "wave":"0.1.0.1.0.1.0.1.",
+         "node":"..A...C...E...G"
+      },
+      {
+         "name":"B",
+         "wave":"XXXXXXXXXXXXXXXXXXX",
+         "phase":3
+      },
+      {
+         "name":"Counter",
+         "wave":"=.=...=...=...=.",
+         "data":[
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"
+         ],
+         "node":"..B...D...F...H"
+      }
+   ],
+   "edge":[
+      "A-B",
+      "C-D",
+      "E-F",
+      "G-H"
+   ],
+   "head":{
+      "text":[
+         "tspan",
+         [
+            "tspan",
+            {
+               "class":"h5"
+            },
+            "Travelled Distance"
+         ]
+      ]
+   }
+}
