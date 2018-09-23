@@ -16,12 +16,41 @@ If we add the B signal into the equation and count on both rising and falling ed
 
 ![Travelled Distance 4X](documentation/travelled_distance-4x.png)
 
-![Travelled Distance 4X](documentation/travelled_distance-2x.png)
+In general the travelled angular distance can be expressed as:
+
+![Distance Formula](documentation/distance_equation.gif)
+
+Where P is the counted pulses (edges of the signal), PPR is the Pulses Per Revolution and Nx is the multiplier factor given by the decoding mode (1, 2, 4).
+
+## Why don't we just use 4x? ##
+
+Since the 4x mode gives higher resolution it might appear this is the only mode in which an encoder should be read. There are reasons though to use the other modes as well. In some cases, more rare though nowadays where microcontrollers are in pretty much every project, simplicity of hardware is one factor. You can simply hook up the A signal to a the clock of a counter, in which case you would be reading in 1x. For applications geared towards human interaction another important factor is the amount of detents versus PPR. For instance an encoder could have 30 detents and 15 PPR. If read in 1x mode it could result rather annoying as it requires to travel through two detents for an action to be taken (think, for instance, moving to the next entry on a menu), 2x would be the appropriate choice in this case. 4x would be completely out of the question as there would be an action between detents meaning you would be to set a specific item in the manu enties list.
+
+Additionally increasing resolution does not equate to increasing precision, by reading an encoder in 4x mode also the errors are mutiplied by the same factor so, in practice, the accuracy is the same.
+
+## Direction of travel ##
+
+The second interesting characteristic of quadrature encoders is that they allow to detect in which direction the shaft is rotating. To understand how this is achieved see the timing diagram below which, we will assume, is representative of the signals when the shaft is travelling clockwise.
 
 ![1x-CW](documentation/1x-CW.png)
 
+Notice how B is always *low* on the rising edge of A. If you now follow the above diagram in the opposite direction, reading it from right to left, which is what would happen if you turned the shaft counter-clockwise, you will see that B will always be *high* on the rising edges of A, this is becasue, effectively, the falling edges of A have become the rising ones. The timing diagram below shows the signals when the encoder is turning counter-clockwise.
+
 ![1x-CCW](documentation/1x-CCW.png)
+
+So, simply by reading the value of B on the rising edge of A we can determine the direction of rotation. You can see an example of this in `Encode1x.ino` where an interrupt is attacched to the A signal rising edge. When the interrupt triggers the ISR we count one event determing the direction of travel by reading B.
+
+When moving to 2x decoding we will need to determine the direction of travel by looking at B, as above, for the rising edge and the B negated on the falling edge, as should become apparent from the timing diagram below. You can see an example of this in `Encode2x.ino`.
 
 ![2x-CW](documentation/2x-CW.png)
 
+Finally, moving to 4x encoding is just one more step forward from the above progression. We will need to determine the rotation based on B values on A edges and on A values on B edges. You can see an example of this in `Encode4x.ino`.
+
 ![4x-CW](documentation/4x-CW.png)
+
+## Application in human interfaces ##
+
+Depending on the application, expecially when dealing with human interfaces, further considerations might apply. For instance assume you are controlling a menu selection where items are selected by turning the knob on the encoder. In this case it's mandatory that at each detent the selection moves by one entry. Anything else would feel awkward or plainly unusable (think a move of 2 items per detent!). This limits the selection of the encoder to one where the detents to PPR ratio is either 1, 2 or 4. You will then need to read in the appropriate mode to achieve one action per detent.
+
+Consider instead an application where the knob is used to adjust a value with a relatively large dynamic range, for instance 0 to 360 as in the example code. Making large changes with an increment of 1 per detent would be incredibly annoying as it would take a long time. On the other hand, if the requirement is to be able to asjust the value with a unit resolution, increasing the increment per detent wouldn't be an option. It's at this point that we need to consider another dimension, which is the speed of rotation.  
+
