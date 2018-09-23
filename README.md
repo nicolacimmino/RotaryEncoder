@@ -82,4 +82,4 @@ From here the rest should be pretty much self explanatory, action is taken based
 I build a simple prototype to test the code and get a first-hand impression of how the different solutions feel. If you waant to build one see the `#define` at the top of `RotaryEncoder.ino` for wiring. The display is a monochrome (fixed color is more apt, as the first line is yellow the rest it blue) SSD1306 with I2C interface. The code should be easily adaptable to any other display. The encoder is a 30 detent, 15 PPR encoder with a push button. If your encoder specs are different you might need to adjust the code, in particular the function the calculates the increment in the dymamic increment mode as it might feel too "slippery" or still too slow.
 
 
-![Prototype](documentation/prototype.png)
+![Prototype](documentation/proto.jpg)
