@@ -59,4 +59,13 @@ Consider instead an application where the knob is used to adjust a value with a 
 The graph above refers to the curve I have used in my example code, see `RotatyEncoder.ino`. By no means this is a hard curve suitable for all applications. The number of detents per revolution of your encoder, the dynamic range but also phyical elements such as the diameter of the knob will affect what feels better in practical usage. The curve I used is `y=(20-x)/4` clipped at 1 on the lower bound. Also, in the interest of avoiding divisions, the division by 4 is done by shifiting right by 2: `max(1, (20 - (signed long)(millis() - lastDetentTime)) >> 2);`
         
 
+## Click Button ##
+
+While not strictly realted to rotaty encoders a couple of notes regarding the click button are in place. Rotary encoders meant for human interfaces can have a push button integrated, this combination can be used to create single control intefaces which allow for navigation of menus and set of values. In the example code I made use of both a short and a long press. The first will rotate through the 1x,2x and 4x modes while the second will change between the linear and dynamic increment modes. All logic can be found in `changeMode()` in the example code. 
+
+The first item of interest is the debouncing of the switch. Since this is a push button there will be chatter and, since the following code depends on measuring for how long the button is pressed, we need to make sure that has stopped. The code below does that by implementing a buffer, initialised to 0x55 (binary B01010101). Subsequent reads of the switch are pushed into the lsb rotating the all buffer left.
+
+![Debounce](documentation/debounce.png)
+
+The loop continues until the buffer contains all zeros, indicating 8 consecutive zero readings have been taken.
 
