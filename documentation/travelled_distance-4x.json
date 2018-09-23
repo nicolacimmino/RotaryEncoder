@@ -3,16 +3,16 @@
       {
          "name":"A",
          "wave":"0.1.0.1.0.1.0.1.",
-         "node":"..A.I.C.K.E.M.G"
+         "node":".AICKEMG"
       },
       {
          "name":"B",
-         "wave":"XXXXXXXXXXXXXXXXXXX",
+         "wave":"0.1.0.1.0.1.0.1.0.1",
          "phase":3
       },
       {
          "name":"Counter",
-         "wave":"=.=.=.=.=.=.=.=.",
+         "wave":"================",
          "data":[
             "0",
             "1",
@@ -22,8 +22,16 @@
             "5",
             "6",
             "7",
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15"
          ],
-         "node":"..B.J.D.L.F.N.H"
+         "node":".BJDLFNH"
       }
    ],
    "edge":[
@@ -43,7 +51,7 @@
             {
                "class":"h5"
             },
-            "Travelled Distance 2X"
+            "Travelled Distance 4X"
          ]
       ]
    }
