@@ -67,5 +67,16 @@ The first item of interest is the debouncing of the switch. Since this is a push
 
 ![Debounce](documentation/debounce.png)
 
-The loop continues until the buffer contains all zeros, indicating 8 consecutive zero readings have been taken.
+The loop continues until the buffer contains all zeros, indicating 8 consecutive zero readings have been taken. There's nothing too magic about the value 0x55, in this case 0x01 would do just as well (0x80 clearly not as it would be enough for the first read to be 0 to exit the loop). Being 0x55 and alternation of 0s and 1s it's a good start value whether you are debouncing a switch that is holding an input to zero or one.
+
+The next bit is a loop that will either timeout, after 500mS or exit if the button is releasead. This allows to react immediately to button release, which is expected, but also gives an immediate feedback to a user performing a long press when he kept it press long enough. 
+
+![Debounce2](documentation/debounce2.png)
+
+A more naive implementation that just waits for the button to be released and then times the duration of the press would leave the user wondering whether he pressed the button long enough.
+
+From here the rest should be pretty much self explanatory, action is taken based on the type of press and the function waits for the button to be released before exiting to avoid unwanted re-entry. A final note: the code handling the button is not triggered by an interrupt because it relies on measuring times with `millis()` which is not updating during interrupt servicing (as timer interrupts are waiting for your ISR to end!). Additionally since the function can execute for a very long time, in fact as long as the user keeps the button depressed, it can cause many other side effects if handled in an ISR (eg loss of serial port data). While this is very Arduino specific, it's generally good practice not to have long executing tasks in ISRs.
+
+
+
 
