@@ -16,6 +16,17 @@ If we add the B signal into the equation and count on both rising and falling ed
 
 ![Travelled Distance 4X](documentation/travelled_distance-4x.png)
 
+In general the travelled angular distance can be expressed as:
+
+![Distance Formula](documentation/distance_equation.gif)
+
+Where P is the counted pulses (edges of the signal), PPR is the Pulses Per Revolution and Nx is the multiplier factor given by the decoding mode (1, 2, 4).
+
+## Why don't we just use 4x? ##
+
+
+
+
 ![Travelled Distance 4X](documentation/travelled_distance-2x.png)
 
 ![1x-CW](documentation/1x-CW.png)
