@@ -12,6 +12,12 @@ In other words a rotary encoder with 20 PPR has a resolution of 18 degrees per p
 
 ![Travelled Distance 2X](documentation/travelled_distance-2x.png)
 
+If we add the B signal into the equation and count on both rising and falling edges of A and B we can increase the resolution by a factor of 4. So our 20 PPR encoder can be read with a resolution of 3 degrees. The timing diagram below shows the 4x decoding mode.
+
+![Travelled Distance 4X](documentation/travelled_distance-4x.png)
+
+![Travelled Distance 4X](documentation/travelled_distance-2x.png)
+
 ![1x-CW](documentation/1x-CW.png)
 
 ![1x-CCW](documentation/1x-CCW.png)
