@@ -40,6 +40,11 @@ Notice how B is always *low* on the rising edge of A. If you now follow the abov
 
 So, simply by reading the value of B on the rising edge of A we can determine the direction of rotation. You can see an example of this in `Encode1x.ino` where an interrupt is attacched to the A signal rising edge. When the interrupt triggers the ISR we count one event determing the direction of travel by reading B.
 
+When moving to 2x decoding we will need to determine the direction of travel by looking at B, as above, for the rising edge and the B negated on the falling edge, as should become apparent from the timing diagram below. You can see an example of this in `Encode2x.ino`.
+
 ![2x-CW](documentation/2x-CW.png)
 
+Finally, moving to 4x encoding is just one more step forward from the above progression. We will need to determine the rotation based on B values on A edges and on A values on B edges. You can see an example of this in `Encode4x.ino`.
+
 ![4x-CW](documentation/4x-CW.png)
+
