@@ -48,3 +48,9 @@ Finally, moving to 4x encoding is just one more step forward from the above prog
 
 ![4x-CW](documentation/4x-CW.png)
 
+## Application in human interfaces ##
+
+Depending on the application, expecially when dealing with human interfaces, further considerations might apply. For instance assume you are controlling a menu selection where items are selected by turning the knob on the encoder. In this case it's mandatory that at each detent the selection moves by one entry. Anything else would feel awkward or plainly unusable (think a move of 2 items per detent!). This limits the selection of the encoder to one where the detents to PPR ratio is either 1, 2 or 4. You will then need to read in the appropriate mode to achieve one action per detent.
+
+Consider instead an application where the knob is used to adjust a value with a relatively large dynamic range, for instance 0 to 360 as in the example code. Making large changes with an increment of 1 per detent would be incredibly annoying as it would take a long time. On the other hand, if the requirement is to be able to asjust the value with a unit resolution, increasing the increment per detent wouldn't be an option. It's at this point that we need to consider another dimension, which is the speed of rotation.  
+
