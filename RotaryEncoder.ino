@@ -1,36 +1,61 @@
 
+// Reference design for usage of a rotary encoder. 
+// See https://github.com/nicolacimmino/RotaryEncoder for detailed explanation.
+//  Copyright (C) 2018 Nicola Cimmino
+//
+//    This program is free software: you can redistribute it and/or modify
+//    it under the terms of the GNU General Public License as published by
+//    the Free Software Foundation, either version 3 of the License, or
+//    (at your option) any later version.
+//
+//   This program is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//    GNU General Public License for more details.
+//
+//    You should have received a copy of the GNU General Public License
+//    along with this program.  If not, see http://www.gnu.org/licenses/.
+//
+
 #include <SSD1306AsciiAvrI2c.h>
 #include <PinChangeInterrupt.h>
 
 #define PIN_ENC_A 10
 #define PIN_ENC_B 11
 #define PIN_ENC_SW 12
-#define DISPLAY_I2C_ADDRESS 0x3C
 
+#define DISPLAY_I2C_ADDRESS 0x3C
 SSD1306AsciiAvrI2c oled;
 
 volatile int16_t counter = 0;
 volatile byte encoderMode = 0;
 volatile byte encoderDynamicMode = 0;
 
+/**
+ * Array of function pointers to setup the various modes.
+ */
 extern void setup1XEncode();
 extern void setup2XEncode();
 extern void setup4XEncode();
 
-/**
- * Array of function pointers to setup the various modes.
- */
 void (*modesSetters[3])() = {setup1XEncode, setup2XEncode, setup4XEncode};
 
+/**
+ * Labels for the mode headers.
+ */
 String modeHeaders[3] = {"1X    ", "  2X  ", "    4X"};
-
 String dynamicModeHeaders[2] = {"  LIN", "     EXP"};
 
 /**
  * Change mode. 
+ * 
+ * Change mode is entered when pressing the encoder switch. A short press will change the encode mode while
+ * a long one will change the encoder dynamic mode.
+ * 
  */
 void changeMode()
 {
+    // Allow the switch to stabilise.
     byte debounce = 0x55;
     while (debounce != 0x00)
     {
@@ -38,6 +63,7 @@ void changeMode()
         delay(1);
     }
 
+    // Wait for the switch to be released or a timeout of 500mS to expire.
     unsigned long initialTime = millis();
     while ((millis() - initialTime < 500) && digitalRead(PIN_ENC_SW) == 0)
     {
@@ -53,10 +79,22 @@ void changeMode()
         encoderMode = (encoderMode + 1) % (sizeof(modesSetters) / sizeof(modesSetters[0]));
         modesSetters[encoderMode]();
     }
+
+    // Reflect immedidately on screen the action taken.
+    printHeader();
+
+    // Ensure  the switch has been released or we will trigger an
+    // extra mode change as we will re-enter this function.
+    while (digitalRead(PIN_ENC_SW) == 0)
+    {
+        delay(1);
+    }
 }
 
 /**
- * Apply a change to the counter.
+ * Apply a change to the counter. This is invoked at every step detected.
+ * In liear mode this is a fix increment of 1 at every step. In dynamic
+ * mode the speed of rotation affects the amount of steps.
  */
 void applyCounterChange(bool cw)
 {
@@ -77,6 +115,18 @@ void applyCounterChange(bool cw)
     counter = (counter < 0) ? (360 + counter) : counter % 360;
 }
 
+/**
+ * Print the header contiaining the modes flags indicators.
+ */
+void printHeader()
+{
+    oled.setCursor(0, 0);
+    oled.set1X();
+    oled.print(modeHeaders[encoderMode]);
+    oled.print(dynamicModeHeaders[encoderDynamicMode]);
+    oled.clearToEOL();
+}
+
 void setup()
 {
     pinMode(PIN_ENC_A, INPUT_PULLUP);
@@ -90,27 +140,11 @@ void setup()
     printHeader();
 }
 
-void printHeader()
-{
-    oled.setCursor(0, 0);
-    oled.set1X();
-    oled.print(modeHeaders[encoderMode]);
-    oled.print(dynamicModeHeaders[encoderDynamicMode]);
-    oled.clearToEOL();
-}
-
 void loop()
 {
     if (digitalRead(PIN_ENC_SW) == 0)
     {
         changeMode();
-
-        printHeader();
-
-        while (digitalRead(PIN_ENC_SW) == 0)
-        {
-            delay(1);
-        }
     }
 
     oled.setCursor(0, 3);
