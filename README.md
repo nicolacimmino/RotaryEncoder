@@ -77,6 +77,9 @@ A more naive implementation that just waits for the button to be released and th
 
 From here the rest should be pretty much self explanatory, action is taken based on the type of press and the function waits for the button to be released before exiting to avoid unwanted re-entry. A final note: the code handling the button is not triggered by an interrupt because it relies on measuring times with `millis()` which is not updating during interrupt servicing (as timer interrupts are waiting for your ISR to end!). Additionally since the function can execute for a very long time, in fact as long as the user keeps the button depressed, it can cause many other side effects if handled in an ISR (eg loss of serial port data). While this is very Arduino specific, it's generally good practice not to have long executing tasks in ISRs.
 
+## The Hardware ##
+
+I build a simple prototype to test the code and get a first-hand impression of how the different solutions feel. If you waant to build one see the `#define` at the top of `RotaryEncoder.ino` for wiring. The display is a monochrome (fixed color is more apt, as the first line is yellow the rest it blue) SSD1306 with I2C interface. The code should be easily adaptable to any other display. The encoder is a 30 detent, 15 PPR encoder with a push button. If your encoder specs are different you might need to adjust the code, in particular the function the calculates the increment in the dymamic increment mode as it might feel too "slippery" or still too slow.
 
 
-
+![Prototype](documentation/prototype.png)
