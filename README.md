@@ -24,7 +24,9 @@ Where P is the counted pulses (edges of the signal), PPR is the Pulses Per Revol
 
 ## Why don't we just use 4x? ##
 
-Since the 4x mode gives higher resolution it might appear this is the only mode in which an encoder should be read. There are reasons though to use the other modes as well. In some cases, more rare though nowadays where microcontrollers are in pretty much every project, simplicity of hardware is one factor. You can simply hook up the A signal to a the clock of a counter, in which case you would be reading in 1x. For applications geared towards human interaction another important factor is the amount of detents versus PPR. For instance an encoder could have 30 detents and 15 PPR. If read in 1x mode it could result rather annoying as it requires to travel through two detents for an action to be taken (think, for instance, moving to the next entry on a menu), 2x would be the appropriate choice in this case. 4x would be completely out of the question as there would be an action between detents meaning you would be to set a specific item in the manu enties list.
+Since the 4x mode gives higher resolution it might appear this is the only mode in which an encoder should be read. There are reasons though to use the other modes as well. In some cases, more rare though nowadays where microcontrollers are in pretty much every project, simplicity of hardware is one factor. You can simply hook up the A signal to a the clock of a counter, in which case you would be reading in 1x. If you use an up/down counter hooking up A to the clock and B to the up/down control would give you control in both directions, also in 1x. 
+
+For applications geared towards human interaction another important factor is the amount of detents versus PPR. For instance an encoder could have 30 detents and 15 PPR. If read in 1x mode it could result rather annoying as it requires to travel through two detents for an action to be taken (think, for instance, moving to the next entry on a menu), 2x would be the appropriate choice in this case. 4x would be completely out of the question as there would be an action between detents meaning you would be to set a specific item in the manu enties list.
 
 Additionally increasing resolution does not equate to increasing precision, by reading an encoder in 4x mode also the errors are mutiplied by the same factor so, in practice, the accuracy is the same.
 
@@ -77,6 +79,9 @@ A more naive implementation that just waits for the button to be released and th
 
 From here the rest should be pretty much self explanatory, action is taken based on the type of press and the function waits for the button to be released before exiting to avoid unwanted re-entry. A final note: the code handling the button is not triggered by an interrupt because it relies on measuring times with `millis()` which is not updating during interrupt servicing (as timer interrupts are waiting for your ISR to end!). Additionally since the function can execute for a very long time, in fact as long as the user keeps the button depressed, it can cause many other side effects if handled in an ISR (eg loss of serial port data). While this is very Arduino specific, it's generally good practice not to have long executing tasks in ISRs.
 
+## The Hardware ##
+
+I build a simple prototype to test the code and get a first-hand impression of how the different solutions feel. If you waant to build one see the `#define` at the top of `RotaryEncoder.ino` for wiring. The display is a monochrome (fixed color is more apt, as the first line is yellow the rest it blue) SSD1306 with I2C interface. The code should be easily adaptable to any other display. The encoder is a 30 detent, 15 PPR encoder with a push button. If your encoder specs are different you might need to adjust the code, in particular the function the calculates the increment in the dymamic increment mode as it might feel too "slippery" or still too slow.
 
 
-
+![Prototype](documentation/proto.jpg)
