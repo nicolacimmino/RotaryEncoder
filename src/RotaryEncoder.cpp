@@ -203,7 +203,7 @@ void RotaryEncoder::encoderScanSwitch()
     byte debounce = 0x55;
     while (debounce != 0x00)
     {
-        debounce = (debounce < 1) | (digitalRead(this->pinSW) & 1);
+        debounce = (debounce << 1) | (digitalRead(this->pinSW) & 1);
         delay(1);
     }
 
