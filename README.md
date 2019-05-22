@@ -125,7 +125,7 @@ The first item of interest is the debouncing of the switch. Since this is a push
 byte debounce = 0x55;
 while (debounce != 0x00)
 {
-    debounce = (debounce < 1) | (digitalRead(this->pinSW) & 1);
+    debounce = (debounce << 1) | (digitalRead(this->pinSW) & 1);
     delay(1);
 }
 ```
