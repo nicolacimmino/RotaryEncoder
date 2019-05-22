@@ -20,10 +20,7 @@
 
 #include "RotaryEncoder.h"
 
-void RotaryEncoder::begin(uint8_t pinA, uint8_t pinB, uint8_t pinSW,
-                          uint8_t decodeMode = ROTARY_ENCODER_DECODE_MODE_2X,
-                          uint8_t positionChangeMode = ROTARY_ENCODER_MODE_LINEAR,
-                          int minPosition = 0, int maxPosition = 100)
+void RotaryEncoder::begin(uint8_t pinA, uint8_t pinB, uint8_t pinSW, uint8_t decodeMode, uint8_t positionChangeMode, int minPosition, int maxPosition)
 {
     this->pinA = pinA;
     this->pinB = pinB;

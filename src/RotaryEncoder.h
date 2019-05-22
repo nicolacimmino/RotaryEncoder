@@ -44,7 +44,10 @@ public:
      * Constructor.
      * Only pins need to be set at this stage, other parameters can be modified also through setters.
      */
-    void begin(uint8_t pinA, uint8_t pinB, uint8_t pinSW, uint8_t decodeMode, uint8_t positionChangeMode, int minPosition, int maxPosition);
+    void begin(uint8_t pinA, uint8_t pinB, uint8_t pinSW,
+                          uint8_t decodeMode = ROTARY_ENCODER_DECODE_MODE_2X,
+                          uint8_t positionChangeMode = ROTARY_ENCODER_MODE_LINEAR,
+                          int minPosition = 0, int maxPosition = 100);
 
     /*
      * Loop needs to be called continuosly from the Arduino loop().
