@@ -19,13 +19,13 @@
 //
 
 #include <SSD1306AsciiAvrI2c.h>
-#include "src/RotaryEncoder.h"
+#include <RotaryEncoder.h>
 
 #define PIN_ENC_A 10
 #define PIN_ENC_B 11
 #define PIN_ENC_SW 12
 
-byte encoderMode = 0;
+byte encoderMode = 1;
 byte encoderPositionChangeMode = 0;
 RotaryEncoder rotaryEncoder;
 
@@ -45,7 +45,7 @@ String positionChangeModeHeaders[2] = {"  LIN", "     DYN"};
 uint8_t positionChangeModes[2] = {ROTARY_ENCODER_MODE_LINEAR, ROTARY_ENCODER_MODE_DYNAMIC};
 
 void setup()
-{
+{        
     oled.begin(&Adafruit128x64, DISPLAY_I2C_ADDRESS);
     oled.setFont(System5x7);
 
